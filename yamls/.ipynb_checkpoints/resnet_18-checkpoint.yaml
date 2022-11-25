@@ -1,0 +1,49 @@
+# model
+backbone: 'resnet_18' # resnet_18, resnet18_vd, resnet34_vd, resnet50_vd, resnet101_vd, resnet152_vd
+pretrained: True
+
+# continue_train
+continue_train: False
+# last_params: "work/r18_stage1/Epoch10-Total_Loss0.1290-Val_Loss0.1423"
+
+# data and others
+seed: 1997
+print_interval: 100
+num_workers: 4
+n_class: 26 # 38 age合并之前是38
+input_shape: (256,128,3) # HWC
+classes_path: 'work/model_data/pede.txt'
+annotation_train_path: 'dataset/PA100K/train_1114.txt' #'dataset/train_0623_merge_age.txt' # 'dataset/train_0711_merge_age.txt' 
+annotation_val_path: 'dataset/PA100K/val_1114.txt' #'dataset/test_0617_QAv2_merge_age_remove_dup.txt' # 'dataset/test_0711_merge_age.txt' 
+# annotation_train_path: 'dataset/toy.txt'
+# annotation_val_path: 'dataset/toy.txt'
+
+# training freeze
+lr_freeze: 1e-1
+batch_size: 128
+Init_Epoch: 0
+Freeze_Epoch: 0
+
+# training unfreeze
+lr_unfreeze: 1e-1
+Unfreeze_Epoch: 60
+
+# optim
+optim: SGD # Momentum
+weight_decay: 5e-4
+
+# lr_scheduler
+# lr_s: CosineAnnealingDecay
+lr_s: ReduceOnPlateau
+
+# loss and task
+# attri_loss: focal+bce
+attri_loss: bce
+task: cls_det # cls_det or cls
+
+# augmentation
+aug_flip: False
+
+# save
+save_interval: 1
+save_dir: r18_stage2_dynamic
