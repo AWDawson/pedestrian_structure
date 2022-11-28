@@ -1,5 +1,7 @@
 import os
+import argparse
 from collections import defaultdict
+
 
 def get_gts(anno_file):
     """
@@ -11,8 +13,11 @@ def get_gts(anno_file):
         for line in lines:
             words = line.strip().split()
             img_name = words[0]
-            l, u, r, d = words[1].split(',')
-            annos[img_name] = [int(l), int(u), int(r), int(d)]
+            key = img_name.split('/')[-1][:-4]
+            l, u, r, d, _ = words[1].split(',')
+            if l == '-1':
+                continue
+            annos[key] = [int(l), int(u), int(r), int(d)]
     return annos
 
 def get_recs(anno_file):
@@ -55,7 +60,12 @@ def IOU(rec1, rec2):
         return (intersect / (sum_area - intersect)) * 1.0
 
 if __name__ == '__main__':
-    gt_file = './work/gt_6k.txt'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gt_file', type=str)
+    args = parser.parse_args()
+
+    # gt_file = '/root/paddlejob/workspace/env_run/yangshujie/pedestrian_structure/dataset/PA100K/val_1114.txt'
+    gt_file = args.gt_file
     result_file = './work/pred.txt'
 
     recs = get_recs(result_file)

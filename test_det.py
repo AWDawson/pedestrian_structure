@@ -25,7 +25,7 @@ def preprocess_image(image):
 # 预测时使用
 class CenterNet(object):
     _defaults = {
-        "model_path"        : 'work/r18_stage2_static/Epoch50-Total_Loss0.4355-Val_Loss0.7800',
+        "model_path"        : 'work/r18_stage2_dynamic/Epoch60-Total_Loss0.2503-Val_Loss0.7637',
         "classes_path"      : 'work/model_data/pede.txt',
         "image_size"        : [256,128,3],
         "backbone"          : 'resnet_18', # resnet_18, resnet50_vd, resnet34_vd, resnet101_vd, resnet152_vd
@@ -57,6 +57,7 @@ class CenterNet(object):
         self.down_ratio = 4
         self.regress_ltrb = True
         self.for_mot = False
+        self.model_path = kwargs['model_path']
 
     #---------------------------------------------------#
     #   获得所有的分类
@@ -145,12 +146,10 @@ class CenterNet(object):
         clses = topk_clses.unsqueeze(1)
 
         reg_t = paddle.transpose(reg, [0, 2, 3, 1])
-        #print(reg_t.shape)
         # Like TTFBox, batch size is 1.
         # TODO: support batch size > 1
         reg = paddle.reshape(reg_t, [-1, reg_t.shape[-1]])
         reg = paddle.gather(reg, inds)
-        #print(reg.shape)
         xs = paddle.cast(xs, 'float32')
         ys = paddle.cast(ys, 'float32')
         xs = xs + reg[:, 0:1]
@@ -233,44 +232,40 @@ class CenterNet(object):
             f_r = open("work/test_det_results/%s.txt"%image_id, "a")
             f_r.write("%s %s %s %s %s %s\n" % (predicted_class, scores.numpy(), str(int(left)), str(int(top)), str(int(right)),str(int(bottom))))
 
-            # top = top - 5
-            # left = left - 5 
-            # bottom = bottom + 5
-            # right = right + 5
-        #f.close()
         return image
 
 # 执行预测
 
 import os
+import argparse
 from tqdm import tqdm
 from PIL import Image
 # import matplotlib.pyplot as plt
 
-centernet = CenterNet()
+parser = argparse.ArgumentParser()
+parser.add_argument('--img_dir', type=str)
+parser.add_argument('--gt_file', type=str)
+parser.add_argument('--model_file', type=str)
+args = parser.parse_args()
+
+centernet = CenterNet(model_path=args.model_file)
 
 record = True  # 是否记录检测结果至txt文件
-test_img_path = "dataset/0519/"
+
+test_img_path = args.img_dir
 test_img_list = []
 
-# names = os.listdir('dataset/pic')
-# for name in names:
-#     test_img_list.append(f'dataset/pic/{name}')
+f = open(args.gt_file, 'r')
 
-f = open('work/gt_6k.txt', 'r')
 for line in f.readlines():
     line = line.strip()
     items = line.split(' ')
-    path = os.path.join('dataset/all', items[0]+'.jpg')
-    #test_img_list.append('./dataset/all/YZ002_002_1596682054006_1596682054006_V20220518test_1.jpg')
-    test_img_list.append(path)
+    test_img_list.append(items[0])
 
 img_list_sorted = sorted(test_img_list)
 # print(img_list_sorted)
 
 for img in tqdm(img_list_sorted):
-    #print(img)
-    #image = Image.open(os.path.join(test_img_path, img))
     image = Image.open(img)
     img = img.split('/')[-1]
     image_id = img.split(".")[0]

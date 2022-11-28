@@ -149,7 +149,6 @@ if __name__ == "__main__":
     parse.add_argument('-y', '--yaml', type=str, help='path of .yaml')
     args = parse.parse_args()
     config = get_config(args.yaml)
-
     # fix seed
     set_seed(config['seed'])
 

@@ -13,10 +13,8 @@ num_workers: 4
 n_class: 26 # 38 age合并之前是38
 input_shape: (256,128,3) # HWC
 classes_path: 'work/model_data/pede.txt'
-annotation_train_path: 'dataset/PA100K/train_1114.txt' #'dataset/train_0623_merge_age.txt' # 'dataset/train_0711_merge_age.txt' 
-annotation_val_path: 'dataset/PA100K/val_1114.txt' #'dataset/test_0617_QAv2_merge_age_remove_dup.txt' # 'dataset/test_0711_merge_age.txt' 
-# annotation_train_path: 'dataset/toy.txt'
-# annotation_val_path: 'dataset/toy.txt'
+annotation_train_path: '/home/work/data/pa100k/train_pseudo_head.txt'
+annotation_val_path: '/home/work/data/pa100k/val_pseudo_head.txt'
 
 # training freeze
 lr_freeze: 1e-1
